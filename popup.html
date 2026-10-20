@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; width: 320px; background: #0e1a2b; color: #e9eff7;
+         font: 14px/1.5 "PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif; }
+  .p { padding: 16px; }
+  h1 { margin: 0 0 2px; font-size: 17px; font-weight: 650; }
+  .sub { margin: 0 0 14px; color: #8da2bd; font-size: 12.5px; }
+  button.go { display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 11px 13px;
+              background: #13233a; color: inherit; border: 1px solid #24405f; border-left-width: 4px;
+              border-radius: 8px; cursor: pointer; font: inherit; }
+  button.go:hover { background: #182c47; }
+  button.go:focus-visible { outline: 2px solid #2fd4c0; outline-offset: 2px; }
+  button.go b { display: block; font-weight: 600; }
+  button.go small { color: #8da2bd; font-size: 12px; }
+  .un { border-left-color: #ff8a5b; }
+  .fb { border-left-color: #2fd4c0; }
+  .links { margin-top: 6px; font-size: 12.5px; color: #8da2bd; display: flex; gap: 14px; }
+  .links a { color: #8da2bd; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .links a:hover { color: #e9eff7; }
+</style>
+</head>
+<body>
+<div class="p">
+  <h1>X 互关助手</h1>
+  <p class="sub">扫描关注列表，批量取关与回关</p>
+  <button class="go un" data-go="unfollow"><b>取关未回关的人</b><small>白名单里的账号永远不会被取关</small></button>
+  <button class="go fb" data-go="followback"><b>回关未关注的人</b><small>回关关注了你、但你还没关注的账号</small></button>
+  <div class="links">
+    <a data-go="whitelist" tabindex="0">白名单</a>
+    <a data-go="history" tabindex="0">操作记录</a>
+    <a data-go="settings" tabindex="0">设置</a>
+  </div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

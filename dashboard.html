@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X 互关助手</title>
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <h1>X 互关助手</h1>
+    <div class="acct" id="acct">未连接 X</div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="task" class="on">任务</button>
+    <button data-tab="whitelist">白名单<span class="count" id="wlCount">0</span></button>
+    <button data-tab="history">操作记录</button>
+    <button data-tab="settings">设置</button>
+  </nav>
+
+  <!-- ===== 任务 ===== -->
+  <section id="tab-task" class="tab on">
+    <div class="venn" id="venn">
+      <div class="lane lane-top"><div class="brk" id="brkFollowing"><span>关注中 <b id="sFollowing">0</b></span></div></div>
+      <div class="strip" id="strip">
+        <div class="seg a" id="segA"></div>
+        <div class="seg m" id="segM"></div>
+        <div class="seg b" id="segB"></div>
+        <div class="strip-empty" id="stripEmpty">扫描后显示你和粉丝的关系</div>
+      </div>
+      <div class="lane lane-bot"><div class="brk bot" id="brkFans"><span>粉丝 <b id="sFollowers">0</b></span></div></div>
+      <div class="legend">
+        <div class="lg a"><b id="sNotBack">0</b><span>没有回关我</span><em id="sNotBackSub"></em></div>
+        <div class="lg m"><b id="sMutual">0</b><span>互相关注</span></div>
+        <div class="lg b"><b id="sFans">0</b><span>我还没回关</span><em id="sFansBlue"></em></div>
+      </div>
+      <div class="scanrow">
+        <button class="btn" id="btnScan">扫描关注列表</button>
+        <span class="muted" id="scanInfo">尚未扫描</span>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="listpane">
+        <div class="toolbar">
+          <input id="q" type="search" placeholder="搜索昵称或用户名">
+          <button class="btn quiet" id="btnAll">全选</button>
+          <button class="btn quiet" id="btnNone">全不选</button>
+          <button class="btn quiet" id="btnWl">把勾选的加入白名单</button>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th class="c"></th><th id="colAccount">账号</th><th class="n">粉丝</th><th class="n">关注</th><th class="n">帖子</th><th>标记</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="empty"></div>
+        </div>
+        <details class="excl" id="excl" hidden>
+          <summary id="exclSum">已排除的账号</summary>
+          <p class="note" id="exclNote"></p>
+          <div class="exclbody" id="exclList"></div>
+        </details>
+      </div>
+
+      <aside class="side">
+        <div class="aboutbox" id="aboutBox">
+          <div class="abouttitle"><span>X 互关助手</span><span class="ver" id="aboutVer">v0.2.8</span></div>
+          <div class="aboutsub">
+            <a class="get" href="https://x.com/ASMD_BLSH" target="_blank" rel="noopener noreferrer">获取最新版</a>
+            <span class="author">作者 X：<a href="https://x.com/ASMD_BLSH" target="_blank" rel="noopener noreferrer">@ASMD_BLSH</a></span>
+          </div>
+        </div>
+        <div class="autobox" id="autoBox">
+          <label class="autotoggle"><input type="checkbox" id="cbAuto"><span>全自动模式（只自动回关）</span></label>
+          <div class="autostatus" id="autoStatus">手动模式：所有操作都由你点击开始。</div>
+          <div class="row autobtns" id="autoBtns" hidden>
+            <button class="btn quiet sm" id="btnAutoNow">立即检查一轮</button>
+            <button class="btn primary sm" id="btnAutoResume" hidden>提前恢复</button>
+          </div>
+          <div class="note" id="autoInfo"></div>
+        </div>
+        <div class="modes" id="modes">
+          <button data-mode="unfollow" class="on"><b>取关未回关的人</b><small>白名单里的账号永远不会被取关</small></button>
+          <button data-mode="followback"><b>回关未关注的人</b><small>回关关注了你、但你还没关注的账号</small></button>
+        </div>
+        <p class="note" id="filterNote"></p>
+        <label class="quick" id="quickVerified" hidden><input type="checkbox" id="cbVerifiedOnly"><span>只回关付费蓝 V 账号</span></label>
+        <div class="banner" id="resume" hidden></div>
+        <div class="banner warn" id="cooldown" hidden></div>
+
+        <div class="runbox">
+          <div class="sel" id="selInfo">未选择账号</div>
+          <div class="bar"><i id="barFill"></i></div>
+          <div class="status" id="status">空闲</div>
+          <div class="actions">
+            <button class="btn primary" id="btnStart" disabled>开始</button>
+            <button class="btn danger" id="btnStop" hidden>停止</button>
+          </div>
+          <div class="daily" id="daily"></div>
+        </div>
+
+        <div class="logbox">
+          <div class="loghead"><span>运行日志</span><button class="link" id="btnClearLog">清空</button></div>
+          <div class="log" id="log"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== 白名单 ===== -->
+  <section id="tab-whitelist" class="tab">
+    <div class="twocol">
+      <div class="panel">
+        <h2>添加账号</h2>
+        <p class="note">每行一个，或用逗号、空格分隔。可以带 @，也可以直接粘贴主页链接。白名单里的账号即使没有回关你，也不会被取关。添加后立即保存在本地，重新打开浏览器或重新扫描都不会丢失。</p>
+        <textarea id="wlInput" rows="7" placeholder="@jack&#10;https://x.com/xxx"></textarea>
+        <div class="row">
+          <button class="btn primary" id="wlAdd">添加到白名单</button>
+          <button class="btn quiet" id="wlExport">导出</button>
+          <button class="btn quiet" id="wlImportBtn">导入</button>
+          <input type="file" id="wlImport" accept="application/json,.json" hidden>
+        </div>
+        <p class="note" id="wlMsg"></p>
+      </div>
+      <div class="panel">
+        <div class="row between"><h2>已保护的账号</h2><input id="wlSearch" type="search" placeholder="搜索"></div>
+        <div class="wllist" id="wlList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 操作记录 ===== -->
+  <section id="tab-history" class="tab">
+    <div class="row between head">
+      <h2>操作记录</h2>
+      <div class="row">
+        <button class="btn quiet" id="hRefollow">重新关注勾选的取关记录</button>
+        <button class="btn quiet" id="hCsv">导出 CSV</button>
+        <button class="btn quiet dangert" id="hClear">清空记录</button>
+      </div>
+    </div>
+    <div class="tablewrap tall">
+      <table>
+        <thead><tr><th class="c"></th><th>时间</th><th>操作</th><th>账号</th><th>结果</th></tr></thead>
+        <tbody id="hRows"></tbody>
+      </table>
+      <div class="empty" id="hEmpty">还没有操作记录</div>
+    </div>
+  </section>
+
+  <!-- ===== 设置 ===== -->
+  <section id="tab-settings" class="tab">
+    <div class="form" id="form"></div>
+    <div class="row tools">
+      <button class="btn quiet" id="btnDiag">检查接口</button>
+      <button class="btn quiet" id="btnResetOps">重置接口缓存</button>
+      <button class="btn quiet" id="btnDefaults">恢复默认设置</button>
+    </div>
+    <p class="note">检查接口会让 x.com 标签页重新读取 Followers/Following 的接口信息，并把结果写到任务页的日志里。数据只保存在这个浏览器的本地存储中，不会上传到任何地方。</p>
+  </section>
+</div>
+<div class="lockmask" id="lockMask" hidden>
+  <div class="lockcard">
+    <h2>另一个仪表盘正在运行</h2>
+    <p>同一个浏览器里只允许一个仪表盘执行任务，避免重复取关/回关和记录互相覆盖。</p>
+    <p class="note">关闭另一个仪表盘页面后，这个页面会自动刷新并接管；也可以直接关掉这个页面。</p>
+  </div>
+</div>
+<script src="dashboard.js"></script>
+</body>
+</html>
